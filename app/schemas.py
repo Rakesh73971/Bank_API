@@ -1,22 +1,22 @@
 from pydantic import BaseModel
 
-class BankCreate(BaseModel):
-    name: str
+class BankBase(BaseModel):
+    name : str
 
-class BankOut(BankCreate):
-    id: int
+class BankResponse(BankBase):
+    id : int
 
     class Config:
         from_attributes = True
 
-class BranchCreate(BaseModel):
-    bank_id: int
-    branch_name: str
-    city: str
-    ifsc: str
+class BranchBase(BaseModel):
+    bank_id : int
+    branch_name : str
+    city : str
+    ifsc : str
 
-class BranchOut(BaseModel):
-    id: int
+class BranchResponse(BranchBase):
+    id : int
 
     class Config:
         from_attributes = True
