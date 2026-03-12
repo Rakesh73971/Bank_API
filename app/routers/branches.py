@@ -1,27 +1,27 @@
-from fastapi import APIRouter,Depends,status,HTTPException
+from fastapi import APIRouter, Depends, HTTPException,status
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.models import Branch
-from app.schemas import BranchBase,BranchResponse
+from ..database import get_db
+from ..schemas import BranchResponse,BranchBase
+from typing import List
+from ..services import branch_service
 
-router = APIRouter(
-    prefix='/branches',
-    tags=['Branches']
-)
+router = APIRouter(prefix="/branches", tags=["Branches"])
 
-@router.get('/{branch_id}',status_code=status.HTTP_200_OK,response_model=BranchResponse)
-def get_branch(branch_id:int,db:Session=Depends(get_db)):
-    branch = db.query(Branch).filter(Branch.id == branch_id).first()
-    if branch is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'Branch with id {id} not found')
+@router.get("/{id}",status_code=status.HTTP_200_OK, response_model=BranchResponse)
+def get_branch(id: int, db: Session = Depends(get_db)):
+
+    branch = branch_service.get_branch_by_id(id, db)
+
+    if not branch:
+        raise HTTPException(status_code=404, detail="Branch not found")
+
     return branch
+
+@router.get('/',status_code=status.HTTP_200_OK,response_model=List[BranchResponse])
+def get_branches(db:Session=Depends(get_db)):
+    branches = branch_service.get_all_branches(db)
+    return branches
 
 @router.post('/',status_code=status.HTTP_201_CREATED,response_model=BranchResponse)
 def create_branch(branch_data:BranchBase,db:Session=Depends(get_db)):
-    branch = Branch(**branch_data.model_dump())
-    db.add(branch)
-    db.commit()
-    db.refresh(branch)
-    return branch
-
-
+    return branch_service.create_branch(branch_data,db)
