@@ -6,7 +6,7 @@ def test_get_branches(client):
 
 def test_create_branch(client):
 
-    # First create a bank because branch needs bank_id
+
     bank_data = {"name": "HDFC"}
 
     bank_response = client.post("/banks/", json=bank_data)
